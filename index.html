@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario dell'Avvento Estivo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #2980b9 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '💙';
+            position: fixed;
+            top: 10%;
+            left: 5%;
+            font-size: 2em;
+            opacity: 0.3;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '💙';
+            position: fixed;
+            top: 20%;
+            right: 8%;
+            font-size: 1.5em;
+            opacity: 0.4;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+            position: relative;
+        }
+
+        .header::before {
+            content: '💙';
+            position: absolute;
+            top: -10px;
+            left: 30%;
+            font-size: 1.2em;
+            opacity: 0.5;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .header::after {
+            content: '💙';
+            position: absolute;
+            top: -5px;
+            right: 25%;
+            font-size: 1em;
+            opacity: 0.6;
+            animation: pulse 4s ease-in-out infinite reverse;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #fff, #e3f2fd, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+            font-weight: 300;
+            margin-top: 10px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+            padding: 0 10px;
+        }
+
+        .day-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .day-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .day-card:hover::before {
+            left: 100%;
+        }
+
+        .day-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .day-card.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: rgba(200, 200, 200, 0.7);
+            transform: none;
+        }
+
+        .day-card.locked:hover {
+            transform: none;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .day-card.completed {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(76, 175, 80, 0.3);
+        }
+
+        .day-card.completed::after {
+            content: '✓';
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            animation: checkmark 0.6s ease-out;
+        }
+
+        .day-number {
+            font-size: 2em;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .day-card.completed .day-number {
+            color: white;
+            -webkit-text-fill-color: white;
+        }
+
+        .day-date {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 15px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .day-card.completed .day-date {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .game-type {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 25px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .wordle {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white;
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+        }
+
+        .photo {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .game-icon {
+            font-size: 2.2em;
+            margin: 12px 0 8px 0;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 20px;
+            top: 15px;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        .wordle-game {
+            text-align: center;
+        }
+
+        .wordle-grid {
+            display: grid;
+            grid-template-rows: repeat(6, 1fr);
+            gap: 5px;
+            margin: 20px auto;
+            width: 250px;
+        }
+
+        .wordle-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+        }
+
+        .wordle-cell {
+            width: 45px;
+            height: 45px;
+            border: 2px solid #d3d6da;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            background: white;
+        }
+
+        .wordle-cell.correct {
+            background: #6aaa64;
+            color: white;
+            border-color: #6aaa64;
+        }
+
+        .wordle-cell.partial {
+            background: #c9b458;
+            color: white;
+            border-color: #c9b458;
+        }
+
+        .wordle-cell.wrong {
+            background: #787c7e;
+            color: white;
+            border-color: #787c7e;
+        }
+
+        .input-word {
+            padding: 15px;
+            font-size: 1.2em;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            width: 200px;
+            text-align: center;
+            margin: 20px 10px;
+            text-transform: uppercase;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+        }
+
+        .photo-game {
+            text-align: center;
+        }
+
+        .photo-container {
+            margin: 20px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            max-width: 400px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .photo-container img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            transform: scale(3);
+            transition: transform 1s ease-out;
+            cursor: pointer;
+        }
+
+        .photo-container img.revealed {
+            transform: scale(1);
+        }
+
+        .zoom-hint {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            pointer-events: none;
+        }
+
+        .input-city {
+            padding: 15px;
+            font-size: 1.2em;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            width: 250px;
+            text-align: center;
+            margin: 20px 10px;
+        }
+
+        .message {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .attempts {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        @keyframes checkmark {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+            100% { transform: scale(1) rotate(360deg); opacity: 1; }
+        }
+
+        .floating-heart {
+            position: fixed;
+            font-size: 1.5em;
+            opacity: 0.2;
+            pointer-events: none;
+            animation: float 10s ease-in-out infinite;
+        }
+
+        .floating-heart:nth-child(1) { top: 60%; left: 10%; animation-delay: 0s; }
+        .floating-heart:nth-child(2) { top: 40%; right: 15%; animation-delay: 2s; }
+        .floating-heart:nth-child(3) { top: 80%; left: 70%; animation-delay: 4s; }
+
+        @media (max-width: 768px) {
+            .calendar-grid {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 20px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.2em;
+            }
+
+            .header::before,
+            .header::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✨ Calendario dell'Avvento Estivo ✨</h1>
+            <p>Dal 4 Agosto al 2 Settembre - Un gioco al giorno!</p>
+        </div>
+
+        <div class="calendar-grid" id="calendar">
+            <!-- I giorni verranno generati dinamicamente -->
+        </div>
+
+        <!-- Cuori fluttuanti -->
+        <div class="floating-heart" style="top: 60%; left: 10%;">💙</div>
+        <div class="floating-heart" style="top: 40%; right: 15%;">💙</div>
+        <div class="floating-heart" style="top: 80%; left: 70%;">💙</div>
+    </div>
+
+    <!-- Modal per i giochi -->
+    <div id="gameModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="gameContent">
+                <!-- Contenuto del gioco -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configurazione del calendario
+        const gameData = {
+            '2025-08-04': { type: 'photo', city: 'Airlie Beach', image: 'Airlie Beach.HEIC' },
+            '2025-08-05': { type: 'wordle', word: 'TRENO' },
+            '2025-08-06': { type: 'photo', city: 'Amsterdam', image: 'Amsterdam.HEIC' },
+            '2025-08-07': { type: 'wordle', word: 'GOTTO' },
+            '2025-08-08': { type: 'photo', city: 'Berlino', image: 'Berlino.jpg' },
+            '2025-08-09': { type: 'photo', city: 'Brisbane', image: 'Brisbane.HEIC' },
+            '2025-08-10': { type: 'wordle', word: 'MANGO' },
+            '2025-08-11': { type: 'photo', city: 'Bucharest', image: 'Bucharest.jpg' },
+            '2025-08-12': { type: 'wordle', word: 'CURRY' },
+            '2025-08-13': { type: 'photo', city: 'Budapest', image: 'Budapest.jpg' },
+            '2025-08-14': { type: 'photo', city: 'Colonia', image: 'Colonia.HEIC' },
+            '2025-08-15': { type: 'wordle', word: 'LETTO' },
+            '2025-08-16': { type: 'photo', city: 'Dublino', image: 'Dublino.jpg' },
+            '2025-08-17': { type: 'wordle', word: 'COSTA' },
+            '2025-08-18': { type: 'photo', city: 'Gambarie', image: 'Gambarie.HEIC' },
+            '2025-08-19': { type: 'wordle', word: 'CAFFE' },
+            '2025-08-20': { type: 'photo', city: 'Milano', image: 'Milano.HEIC' },
+            '2025-08-21': { type: 'photo', city: 'Napoli', image: 'Napoli.jpg' },
+            '2025-08-22': { type: 'wordle', word: 'INDIA' },
+            '2025-08-23': { type: 'photo', city: 'Parigi', image: 'Parigi.jpg' },
+            '2025-08-24': { type: 'photo', city: 'Pechino', image: 'Pechino.jpg' },
+            '2025-08-25': { type: 'wordle', word: 'LIBRO' },
+            '2025-08-26': { type: 'photo', city: 'Pisa', image: 'Pisa.jpg' },
+            '2025-08-27': { type: 'wordle', word: 'ZUCCA' },
+            '2025-08-28': { type: 'photo', city: 'Sydney', image: 'Sydney.jpg' },
+            '2025-08-29': { type: 'wordle', word: 'PIZZA' },
+            '2025-08-30': { type: 'photo', city: 'Valencia', image: 'Valencia.jpg' },
+            '2025-08-31': { type: 'photo', city: 'Vulcano', image: 'Vulcano.jpg' },
+            '2025-09-01': { type: 'photo', city: 'Whitsunday Island', image: 'Whitsunday Island.HEIC' },
+            '2025-09-02': { type: 'wordle', word: 'FIORI' }
+        };
+
+        // Stato del gioco (salvato nel browser)
+        let gameState = JSON.parse(localStorage.getItem('adventCalendarState') || '{}');
+        let currentGame = null;
+
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', function() {
+            generateCalendar();
+            setupModal();
+        });
+
+        function generateCalendar() {
+            const calendar = document.getElementById('calendar');
+            const today = new Date();
+            
+            Object.keys(gameData).forEach(dateStr => {
+                const gameDate = new Date(dateStr);
+                const game = gameData[dateStr];
+                const dayNumber = gameDate.getDate();
+                const monthName = gameDate.toLocaleDateString('it-IT', { month: 'long' });
+                
+                const isAvailable = gameDate <= today;
+                const isCompleted = gameState[dateStr] === 'completed';
+                
+                const dayCard = document.createElement('div');
+                dayCard.className = `day-card ${!isAvailable ? 'locked' : ''} ${isCompleted ? 'completed' : ''}`;
+                dayCard.dataset.date = dateStr;
+                
+                const icon = game.type === 'wordle' ? '📝' : '📷';
+                const gameTypeClass = game.type === 'wordle' ? 'wordle' : 'photo';
+                const gameTypeName = game.type === 'wordle' ? 'Wordle' : 'Indovina il Luogo';
+                
+                dayCard.innerHTML = `
+                    <div class="day-number">${dayNumber}</div>
+                    <div class="day-date">${monthName}</div>
+                    <div class="game-type ${gameTypeClass}">${gameTypeName}</div>
+                    <div class="game-icon">${icon}</div>
+                    ${!isAvailable ? '<div style="margin-top: 10px;">🔒 Bloccato</div>' : ''}
+                `;
+                
+                if (isAvailable) {
+                    dayCard.addEventListener('click', () => openGame(dateStr));
+                }
+                
+                calendar.appendChild(dayCard);
+            });
+        }
+
+        function openGame(dateStr) {
+            const game = gameData[dateStr];
+            
+            // Se il gioco è già completato, mostra un messaggio
+            if (gameState[dateStr] === 'completed') {
+                alert('🎉 Hai già completato questo gioco!');
+                return;
+            }
+            
+            currentGame = { date: dateStr, ...game };
+            
+            const modal = document.getElementById('gameModal');
+            const content = document.getElementById('gameContent');
+            
+            if (game.type === 'wordle') {
+                content.innerHTML = createWordleGame(game.word);
+                initWordle();
+            } else {
+                content.innerHTML = createPhotoGame(game.city, game.image);
+                initPhotoGame();
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        function createWordleGame(word) {
+            return `
+                <div class="wordle-game">
+                    <h2>🔤 Wordle del Giorno</h2>
+                    <p>Indovina la parola di 5 lettere!</p>
+                    
+                    <div class="wordle-grid" id="wordleGrid">
+                        ${Array(6).fill(0).map(() => `
+                            <div class="wordle-row">
+                                ${Array(5).fill(0).map(() => '<div class="wordle-cell"></div>').join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div>
+                        <input type="text" id="wordInput" class="input-word" maxlength="5" placeholder="Parola...">
+                        <button onclick="submitWord()" class="btn">Prova!</button>
+                    </div>
+                    
+                    <div id="wordleMessage"></div>
+                    <div id="wordleAttempts" class="attempts">Tentativi: 0/6</div>
+                </div>
+            `;
+        }
+
+        function createPhotoGame(city, imagePath) {
+            return `
+                <div class="photo-game">
+                    <h2>📷 Indovina il Luogo</h2>
+                    <p>Che città è questa?</p>
+                    
+                    <div class="photo-container">
+                        <img id="gamePhoto" src="images/${imagePath}" alt="Indovina questa città" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2RkZCIvPgo8dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4IiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+SW1tYWdpbmUgbm9uIHRyb3ZhdGE8L3RleHQ+Cjwvc3ZnPg=='">
+                        <div class="zoom-hint">🔍 Zoom 3x</div>
+                    </div>
+                    
+                    <div>
+                        <input type="text" id="cityInput" class="input-city" placeholder="Nome della città...">
+                        <button onclick="submitCity()" class="btn">Indovina!</button>
+                    </div>
+                    
+                    <div id="photoMessage"></div>
+                    <div id="photoAttempts" class="attempts">Tentativi: 0/3</div>
+                </div>
+            `;
+        }
+
+        // Logica Wordle
+        let wordleAttempts = 0;
+        let wordleCompleted = false;
+
+        function initWordle() {
+            wordleAttempts = 0;
+            wordleCompleted = false;
+            document.getElementById('wordInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') submitWord();
+            });
+        }
+
+        function submitWord() {
+            if (wordleCompleted) return;
+            
+            const input = document.getElementById('wordInput');
+            const guess = input.value.toUpperCase().trim();
+            const target = currentGame.word.toUpperCase();
+            
+            if (guess.length !== 5) {
+                showMessage('wordleMessage', 'La parola deve essere di 5 lettere!', 'error');
+                return;
+            }
+            
+            const row = document.querySelectorAll('.wordle-row')[wordleAttempts];
+            const cells = row.querySelectorAll('.wordle-cell');
+            
+            // Colora le celle
+            for (let i = 0; i < 5; i++) {
+                cells[i].textContent = guess[i];
+                
+                if (guess[i] === target[i]) {
+                    cells[i].className = 'wordle-cell correct';
+                } else if (target.includes(guess[i])) {
+                    cells[i].className = 'wordle-cell partial';
+                } else {
+                    cells[i].className = 'wordle-cell wrong';
+                }
+            }
+            
+            wordleAttempts++;
+            document.getElementById('wordleAttempts').textContent = `Tentativi: ${wordleAttempts}/6`;
+            
+            if (guess === target) {
+                showMessage('wordleMessage', '🎉 Complimenti! Hai indovinato!', 'success');
+                wordleCompleted = true;
+                gameState[currentGame.date] = 'completed';
+                localStorage.setItem('adventCalendarState', JSON.stringify(gameState));
+                setTimeout(() => {
+                    document.getElementById('gameModal').style.display = 'none';
+                    generateCalendar();
+                }, 2000);
+            } else if (wordleAttempts >= 6) {
+                showMessage('wordleMessage', `😔 Hai finito i tentativi! La parola era: ${target}`, 'error');
+                wordleCompleted = true;
+            }
+            
+            input.value = '';
+        }
+
+        // Logica Photo Game
+        let photoAttempts = 0;
+        let photoCompleted = false;
+
+        function initPhotoGame() {
+            photoAttempts = 0;
+            photoCompleted = false;
+            document.getElementById('cityInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') submitCity();
+            });
+        }
+
+        function submitCity() {
+            if (photoCompleted) return;
+            
+            const input = document.getElementById('cityInput');
+            const guess = input.value.trim().toLowerCase();
+            const target = currentGame.city.toLowerCase();
+            
+            if (!guess) {
+                showMessage('photoMessage', 'Inserisci il nome di una città!', 'error');
+                return;
+            }
+            
+            photoAttempts++;
+            document.getElementById('photoAttempts').textContent = `Tentativi: ${photoAttempts}/3`;
+            
+            if (guess === target) {
+                // Rivela l'immagine completa
+                const gamePhoto = document.getElementById('gamePhoto');
+                gamePhoto.classList.add('revealed');
+                
+                showMessage('photoMessage', '🎉 Esatto! Hai indovinato la città!', 'success');
+                photoCompleted = true;
+                gameState[currentGame.date] = 'completed';
+                localStorage.setItem('adventCalendarState', JSON.stringify(gameState));
+                setTimeout(() => {
+                    document.getElementById('gameModal').style.display = 'none';
+                    generateCalendar();
+                }, 3000); // Tempo extra per vedere l'immagine completa
+            } else if (photoAttempts >= 3) {
+                // Rivela l'immagine anche se hai perso
+                const gamePhoto = document.getElementById('gamePhoto');
+                gamePhoto.classList.add('revealed');
+                
+                showMessage('photoMessage', `😔 Hai finito i tentativi! Era: ${currentGame.city}`, 'error');
+                photoCompleted = true;
+            } else {
+                showMessage('photoMessage', `❌ Sbagliato! Riprova (${3 - photoAttempts} tentativi rimasti)`, 'error');
+            }
+            
+            input.value = '';
+        }
+
+        function showMessage(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="message ${type}">${message}</div>`;
+        }
+
+        function setupModal() {
+            const modal = document.getElementById('gameModal');
+            const closeBtn = document.querySelector('.close');
+            
+            closeBtn.onclick = function() {
+                modal.style.display = 'none';
+            }
+            
+            window.onclick = function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
